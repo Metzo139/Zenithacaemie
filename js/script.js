@@ -390,7 +390,27 @@ function buildPdf(){
     y += lines.length * 5 + 3;
   });
 
-  pdf.save('preinscription-zenith.pdf');
+  return pdf.output('blob');
+}
+
+async function sendPdfToWhatsApp(){
+  const pdfBlob = buildPdf();
+  const pdfFile = new File([pdfBlob], 'preinscription-zenith.pdf', { type: 'application/pdf' });
+  const whatsappNumber = '221781171818';
+  const message = 'Bonjour, voici le récapitulatif PDF de ma préinscription à Zénith Académie Guez.';
+
+  if (navigator.canShare?.({ files: [pdfFile] })) {
+    await navigator.share({ files: [pdfFile], text: message });
+    return;
+  }
+
+  const downloadUrl = URL.createObjectURL(pdfBlob);
+  const downloadLink = document.createElement('a');
+  downloadLink.href = downloadUrl;
+  downloadLink.download = pdfFile.name;
+  downloadLink.click();
+  URL.revokeObjectURL(downloadUrl);
+  window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
 }
 
 async function submitForm(){
@@ -415,7 +435,22 @@ async function submitForm(){
     const downloadButton = document.getElementById('downloadPdfBtn');
     downloadButton.onclick = event => {
       event.preventDefault();
-      try { buildPdf(); } catch(err) { alert(err.message); }
+      try {
+        const pdfBlob = buildPdf();
+        const downloadUrl = URL.createObjectURL(pdfBlob);
+        const temporaryLink = document.createElement('a');
+        temporaryLink.href = downloadUrl;
+        temporaryLink.download = 'preinscription-zenith.pdf';
+        temporaryLink.click();
+        setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+      } catch(err) { alert(err.message); }
+    };
+    const whatsappButton = document.getElementById('whatsappPdfBtn');
+    whatsappButton.onclick = async event => {
+      event.preventDefault();
+      try { await sendPdfToWhatsApp(); } catch(err) {
+        if (err.name !== 'AbortError') alert(err.message);
+      }
     };
     currentIndex = visibleSteps().length;
     showScreen('success');
