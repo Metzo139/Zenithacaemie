@@ -1,6 +1,6 @@
 # Zénith Académie Guez — Préinscription
 
-A static frontend form for préinscription to Zénith Académie Guez, with optional Vercel + Supabase backend integration.
+A static frontend form for préinscription to Zénith Académie Guez, with Vercel + Supabase storage and PDF download.
 
 ## Features
 
@@ -8,6 +8,8 @@ A static frontend form for préinscription to Zénith Académie Guez, with optio
 - External CSS and JavaScript for maintainability
 - SVG logo fallback
 - Consent and conditions step with required checkboxes
+- Submissions stored in Supabase through the Vercel endpoint
+- PDF recap download after a successful submission
 - Auto-advance behaviors:
   - If user selects "Non" for scolarité, jumps to project step
   - If user selects "Études + Football", validates then jumps to situation scolaire step for review
@@ -26,12 +28,14 @@ A static frontend form for préinscription to Zénith Académie Guez, with optio
     logo-zenith.svg   # Fallback logo (also uses logo.png if present)
   /api
     submit.js         # Vercel serverless function (Node.js) for form submission
+    dashboard.js      # Protected KPI endpoint for the admin dashboard
+  dashboard.html      # Admin KPI dashboard
   vercel.json         # Vercel configuration
 ```
 
 ## Local Development
 
-Simply open `index.html` in a browser. The form is fully functional client-side and will submit via WhatsApp by default.
+The form must be deployed on Vercel (or run through a local server) for `/api/submit` to be available. After a successful submission, the candidate can download a PDF recap. Opening `index.html` directly with `file://` cannot call the API.
 
 ## Deployment to Vercel
 
@@ -60,12 +64,18 @@ Simply open `index.html` in a browser. The form is fully functional client-side 
 
 4. **Environment Variables** (for Supabase integration):
    After deployment, go to your Vercel project dashboard → Settings → Environment Variables and add:
-   - `SUPABASE_URL`: Your Supabase project URL
-   - `SUPABASE_ANON_KEY`: Your Supabase anon public key
+  - `SUPABASE_URL`: Your Supabase project URL
+  - `SUPABASE_ANON_KEY`: Your Supabase anon public key (fallback)
+  - `SUPABASE_SERVICE_ROLE_KEY`: Your Supabase service role key (recommended for Storage uploads; keep it only in Vercel environment variables)
+  - `DASHBOARD_TOKEN`: A long private token used to access `dashboard.html`
 
-## Supabase Integration (Optional)
+## Dashboard KPI
 
-The provided `api/submit.js` is a stub that logs submissions and returns success. To store submissions in a Supabase database:
+Open `/dashboard.html` on the deployed Vercel URL and enter `DASHBOARD_TOKEN`. The dashboard shows total applications, project distribution, contact sources, monthly activity, document counts and the ten latest applications. The token is kept only for the browser session and the dashboard API uses the service role key server-side.
+
+## Supabase Integration
+
+The endpoint `api/submit.js` stores each submission in the `preinscriptions` table and maps the form fields to the snake_case columns shown below. The files are uploaded to the `backup` Storage bucket under `preinscriptions/`, and their paths are stored in `bulletins_file` and `autre_doc_file`.
 
 1. **Create a Supabase project** at https://supabase.com
 2. **Obtain your URL and anon key** from Project Settings → API
@@ -111,77 +121,32 @@ The provided `api/submit.js` is a stub that logs submissions and returns success
    ```
    Adjust column names and types as needed to match the form fields.
 
-4. **Update `api/submit.js`** with the Supabase insertion logic (see the TODO section in the file). Replace the stub with:
-   ```javascript
-   // Example Supabase insertion (uncomment and adapt after installing supabase)
-   /*
-   const { createClient } = require('@supabase/supabase-js');
-   const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
-   
-   const { data: insertData, error } = await supabase
-     .from('preinscriptions')
-     .insert([data]);
-   
-   if (error) {
-     console.error('Supabase error:', error);
-     return res.status(500).json({ error: 'Failed to save submission' });
-   }
-   */
+4. **Create a Storage bucket** named `backup`. Keep it private if files should only be accessible from the Supabase dashboard or through signed URLs.
+
+5. **Allow anonymous inserts in Supabase** when using the anon key. Run this in the SQL editor:
+   ```sql
+   alter table preinscriptions enable row level security;
+   create policy "Allow public form submissions"
+   on preinscriptions for insert
+   to anon
+   with check (true);
+
+  If `SUPABASE_SERVICE_ROLE_KEY` is not configured, also allow uploads to the bucket:
+  ```sql
+  create policy "Allow public document uploads"
+  on storage.objects for insert
+  to anon
+  with check (bucket_id = 'backup');
+  ```
    ```
-   Then uncomment and adapt the column names to match your table.
 
-5. **Install Supabase dependency** (if using the Supabase client):
-   In the `api/` directory, you can run `npm init -y` and `npm install @supabase/supabase-js`, or rely on Vercel's ability to install dependencies from a `package.json` at the root. For simplicity, you can add a `package.json` in the root:
-   ```json
-   {
-     "name": "zenith-prescription",
-     "version": "1.0.0",
-     "dependencies": {
-       "@supabase/supabase-js": "^2.0.0"
-     }
-   }
-   ```
-   Vercel will install dependencies when building the serverless function.
-
-## Switching Form Submission Endpoint
-
-By default, the form submits via WhatsApp (using `buildWhatsAppMessage()` and `submitForm()` in `js/script.js`). To submit to your Vercel endpoint instead:
-
-1. In `js/script.js`, replace the `submitForm()` function with:
-   ```javascript
-   async function submitForm() {
-     try {
-       const response = await fetch('/api/submit', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(formData),
-       });
-   
-       const result = await response.json();
-   
-       if (!response.ok) {
-         throw new Error(result.error || 'Submission failed');
-       }
-   
-       // Show success message (you can modify this)
-       alert('Votre dossier a été soumis avec succès !');
-       currentIndex = visibleSteps().length; // past recap
-       showScreen('success');
-     } catch (err) {
-       console.error('Submission error:', err);
-       alert('Erreur lors de la soumission : ' + err.message);
-     }
-   }
-   ```
-2. Update the `buildWhatsAppMessage()` function if you no longer need the WhatsApp message (or keep it for fallback).
+6. **Install the dependencies** with `npm install`. Vercel installs `@supabase/supabase-js` and `formidable` from the root `package.json`.
 
 ## Notes
 
 - The form uses `defer` on the script tag, ensuring DOM is ready before execution.
 - All client-side validation is performed before advancing steps.
-- The project is designed to be a static site; the only serverless component is the optional submission endpoint.
+- The project is designed to be a static site; the submission endpoint is required for Supabase and Storage uploads.
 - For production, consider adding spam protection (e.g., hCaptcha) and rate limiting to the endpoint.
 
 ## Support

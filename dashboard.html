@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de bord — Zénith Académie Guez</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <main class="dashboard-shell">
+    <header class="dashboard-header">
+      <div>
+        <p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / PILOTAGE</p>
+        <h1>Vue d'ensemble</h1>
+        <p class="header-note">Les candidatures entrantes, au même endroit.</p>
+      </div>
+      <button class="refresh-button" id="refreshButton" type="button">Actualiser</button>
+    </header>
+
+    <section class="kpi-grid" aria-label="Indicateurs principaux">
+      <article class="kpi-card kpi-main"><span>Total candidatures</span><strong id="totalKpi">—</strong><small>depuis l'ouverture du formulaire</small></article>
+      <article class="kpi-card"><span>Études uniquement</span><strong id="studiesKpi">—</strong><small>projet académique</small></article>
+      <article class="kpi-card"><span>Études + sport</span><strong id="bothKpi">—</strong><small>double parcours</small></article>
+      <article class="kpi-card"><span>Football uniquement</span><strong id="footballKpi">—</strong><small>projet sportif</small></article>
+    </section>
+
+    <section class="analytics-grid">
+      <article class="panel-card"><div class="card-heading"><h2>Projets choisis</h2><span class="card-index">01</span></div><div id="projectsChart" class="bar-list"></div></article>
+      <article class="panel-card"><div class="card-heading"><h2>Origine des contacts</h2><span class="card-index">02</span></div><div id="sourcesChart" class="bar-list"></div></article>
+      <article class="panel-card"><div class="card-heading"><h2>Rythme des candidatures</h2><span class="card-index">03</span></div><div id="monthsChart" class="bar-list"></div></article>
+      <article class="panel-card document-card"><div class="card-heading"><h2>Dossiers documentés</h2><span class="card-index">04</span></div><div class="document-stats"><div><strong id="bulletinsKpi">—</strong><span>avec bulletins</span></div><div><strong id="otherDocsKpi">—</strong><span>autres documents</span></div></div></article>
+    </section>
+
+    <section class="panel-card recent-card">
+      <div class="card-heading"><div><h2>Dernières candidatures</h2><p>Les dix dossiers les plus récents.</p></div><span class="card-index">05</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Projet</th><th>Source</th><th>Classe visée</th><th>Date</th></tr></thead><tbody id="recentTable"><tr><td colspan="5" class="empty-state">Chargement...</td></tr></tbody></table></div>
+    </section>
+    <p class="status-message" id="statusMessage" role="status"></p>
+  </main>
+  <script src="js/dashboard.js" defer></script>
+</body>
+</html>

@@ -1,6 +1,4 @@
 /* ============ CONFIG ============ */
-const ACADEMY_PHONE = '221781171818'; // à remplacer par le vrai numéro WhatsApp de l'académie
-
 const STEPS = [
   { id:'identification', label:'Identification' },
   { id:'scolaire', label:'Situation scolaire' },
@@ -16,6 +14,7 @@ const STEPS = [
 
 let formData = { _projetBothRedirected: false };
 let fileNames = {};
+let selectedFiles = {};
 let currentIndex = 0;
 
 function visibleSteps(){
@@ -64,6 +63,7 @@ document.querySelectorAll('.dropzone').forEach(zone=>{
   zone.addEventListener('click', ()=> input.click());
   input.addEventListener('change', ()=>{
     if(input.files && input.files[0]){
+      selectedFiles[key] = input.files[0];
       fileNames[key] = input.files[0].name;
       formData[key] = input.files[0].name;
       zone.classList.add('has-file');
@@ -344,40 +344,87 @@ function renderRecap(){
 }
 
 /* ============ SUBMIT ============ */
-function buildWhatsAppMessage(){
-  const lines = [];
-  lines.push(`🎓⚽ PRÉINSCRIPTION ZÉNITH ACADÉMIE GUEZ`);
-  lines.push(``);
-  lines.push(`Candidat : ${formData.prenom||''} ${formData.nom||''}`);
-  lines.push(`Né(e) le : ${formData.naissance||''} — ${formData.sexe||''}`);
-  lines.push(`Adresse : ${formData.adresse||''}`);
-  lines.push(`Tél : ${formData.telParent||''}`);
-  lines.push(``);
-  lines.push(`Projet : ${formData.projet === 'etudes' ? 'Études uniquement' : formData.projet === 'football' ? 'Football uniquement' : 'Études + Football'}`);
-  lines.push(`Classe visée : ${formData.classeVisee||''}`);
-  if(formData.projet === 'etudes' || formData.projet === 'both'){
-    lines.push(`Bulletins : ${formData.bulletinsFile ? formData.bulletinsFile + ' (à transmettre en pièce jointe ici)' : 'non fournis'}`);
-  }
-  if(formData.projet === 'football' || formData.projet === 'both'){
-    lines.push(`Poste : ${formData.poste||''} — Club actuel : ${formData.nomClub||'aucun'}`);
-  }
-  lines.push(``);
-  lines.push(`Responsable légal : ${formData.respNomPrenom||''} (${formData.respTel||''})`);
-  lines.push(``);
-  lines.push(`Conditions acceptées : ${formData.conditionsAccorde ? 'Oui' : 'Non'}`);
-  lines.push(`Autorisation image : ${formData.autoImage||''}`);
-  lines.push(`Données personnelles : ${formData.donneesAccorde ? 'Oui' : 'Non'}`);
-  lines.push(``);
-  lines.push(`— Envoyé depuis le formulaire en ligne Zénith Académie —`);
-  return lines.join('\n');
+function buildPdf(){
+  const jsPdf = window.jspdf?.jsPDF;
+  if(!jsPdf) throw new Error('Le générateur PDF est indisponible.');
+
+  const pdf = new jsPdf();
+  const margin = 16;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  let y = 20;
+  const projectLabel = formData.projet === 'etudes' ? 'Études uniquement' : formData.projet === 'football' ? 'Football uniquement' : 'Études + Football';
+  const rows = [
+    ['Nom', formData.nom], ['Prénom(s)', formData.prenom], ['Date de naissance', formData.naissance],
+    ['Sexe', formData.sexe], ['Adresse', formData.adresse], ['Téléphone parent', formData.telParent],
+    ['WhatsApp', formData.whatsapp || '—'], ['Scolarisé', formData.scolarise],
+    ['Établissement', formData.etablissement || '—'], ['Classe actuelle', formData.classeActuelle || '—'],
+    ['Classe visée', formData.classeVisee || '—'], ['Projet', projectLabel],
+    ['Bulletins', formData.bulletinsFile || '—'], ['Autre document', formData.autreDocFile || '—'],
+    ['Intéressé football', formData.interesseFoot || '—'], ['Poste', formData.poste || '—'],
+    ['Club / école', formData.nomClub || '—'], ['Ancienneté', formData.anciennete || '—'],
+    ['Objectifs', (formData.objectifs || []).join(', ') || '—'],
+    ['Connu par', formData.connuPar || '—'], ['Message', formData.messageLibre || '—'],
+    ['Responsable légal', formData.respNomPrenom], ['Lien', formData.lienEleve || '—'],
+    ['Téléphone responsable', formData.respTel], ['WhatsApp responsable', formData.respWhatsapp || '—'],
+    ['Informations exactes', formData.certifie ? 'Oui' : 'Non'], ['Autorise le contact', formData.autoContact ? 'Oui' : 'Non'],
+    ['Conditions acceptées', formData.conditionsAccorde ? 'Oui' : 'Non'], ['Autorisation image', formData.autoImage || '—'],
+    ['Données personnelles', formData.donneesAccorde ? 'Oui' : 'Non'],
+  ];
+
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(18);
+  pdf.text('Préinscription Zénith Académie Guez', margin, y);
+  y += 10;
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.setTextColor(90, 98, 96);
+  pdf.text(`Dossier généré le ${new Date().toLocaleDateString('fr-FR')}`, margin, y);
+  y += 12;
+  pdf.setTextColor(23, 26, 20);
+
+  rows.forEach(([label, value]) => {
+    const lines = pdf.splitTextToSize(`${label} : ${value || '—'}`, pageWidth - margin * 2);
+    if(y + lines.length * 5 + 3 > pageHeight - margin){ pdf.addPage(); y = margin; }
+    pdf.text(lines, margin, y);
+    y += lines.length * 5 + 3;
+  });
+
+  pdf.save('preinscription-zenith.pdf');
 }
 
-function submitForm(){
-  const msg = buildWhatsAppMessage();
-  const link = `https://wa.me/${ACADEMY_PHONE}?text=${encodeURIComponent(msg)}`;
-  document.getElementById('waSendBtn').href = link;
-  currentIndex = visibleSteps().length; // past recap
-  showScreen('success');
+async function submitForm(){
+  const submitButton = document.getElementById('btnNext');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Enregistrement...';
+  try {
+    const payload = new FormData();
+    Object.entries(formData).forEach(([key, value])=>{
+      if(key === '_projetBothRedirected') return;
+      payload.append(key, Array.isArray(value) ? JSON.stringify(value) : String(value ?? ''));
+    });
+    Object.entries(selectedFiles).forEach(([key, file])=> payload.append(key, file, file.name));
+
+    const response = await fetch('/api/submit', {
+      method: 'POST',
+      body: payload,
+    });
+    const result = await response.json();
+    if(!response.ok) throw new Error(result.error || 'Impossible d’enregistrer le dossier.');
+
+    const downloadButton = document.getElementById('downloadPdfBtn');
+    downloadButton.onclick = event => {
+      event.preventDefault();
+      try { buildPdf(); } catch(err) { alert(err.message); }
+    };
+    currentIndex = visibleSteps().length;
+    showScreen('success');
+  } catch(err) {
+    console.error('Submission error:', err);
+    alert(`Erreur lors de l’enregistrement : ${err.message}`);
+    submitButton.disabled = false;
+    submitButton.textContent = 'Envoyer le dossier →';
+  }
 }
 
 /* ============ INIT ============ */
