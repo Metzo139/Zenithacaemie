@@ -1,12 +1,14 @@
+import formidable from 'formidable';
+import { readFile } from 'fs/promises';
+import { randomUUID } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const formidable = require('formidable');
-    const { readFile } = require('fs/promises');
-    const { randomUUID } = require('crypto');
     const form = formidable({ multiples: false, maxFileSize: 10 * 1024 * 1024 });
     const [fields, files] = await form.parse(req);
     
@@ -22,7 +24,6 @@ export default async function handler(req, res) {
     const data = Object.fromEntries(Object.keys(fields).map(key => [key, field(key)]));
     const objectifs = data.objectifs ? JSON.parse(data.objectifs) : [];
 
-    const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
