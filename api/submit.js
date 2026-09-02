@@ -9,8 +9,16 @@ export default async function handler(req, res) {
     const { randomUUID } = require('crypto');
     const form = formidable({ multiples: false, maxFileSize: 10 * 1024 * 1024 });
     const [fields, files] = await form.parse(req);
+    
     const field = key => Array.isArray(fields[key]) ? fields[key][0] : fields[key];
-    const file = key => Array.isArray(files[key]) ? files[key][0] : files[key];
+    const file = key => {
+      if (!files) return null;
+      // Recherche insensible au format (camelCase, snake_case, kebab-case)
+      const targetKey = Object.keys(files).find(k => k.toLowerCase() === key.toLowerCase());
+      const target = targetKey ? files[targetKey] : files[key];
+      return Array.isArray(target) ? target[0] : target;
+    };
+
     const data = Object.fromEntries(Object.keys(fields).map(key => [key, field(key)]));
     const objectifs = data.objectifs ? JSON.parse(data.objectifs) : [];
 
@@ -22,7 +30,7 @@ export default async function handler(req, res) {
 
     async function uploadFile(fileKey) {
       const uploadedFile = file(fileKey);
-      if (!uploadedFile) return null;
+      if (!uploadedFile || !uploadedFile.filepath) return null;
       const originalName = uploadedFile.originalFilename || 'document';
       const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
       const storagePath = `preinscriptions/${Date.now()}-${randomUUID()}-${safeName}`;
@@ -35,8 +43,9 @@ export default async function handler(req, res) {
       return storagePath;
     }
 
-    const bulletinsPath = await uploadFile('bulletinsFile');
-    const autreDocPath = await uploadFile('autreDocFile');
+    // Recherche des fichiers avec plusieurs variantes de noms possibles
+    const bulletinsPath = await uploadFile('bulletins_file') || await uploadFile('bulletinsFile') || await uploadFile('bulletins-file');
+    const autreDocPath = await uploadFile('autre_doc_file') || await uploadFile('autreDocFile') || await uploadFile('autre-doc-file');
 
     const submission = {
       nom: data.nom || null,
@@ -44,41 +53,41 @@ export default async function handler(req, res) {
       naissance: data.naissance || null,
       sexe: data.sexe || null,
       adresse: data.adresse || null,
-      tel_parent: data.telParent || null,
+      tel_parent: data.telParent || data.tel_parent || null,
       whatsapp: data.whatsapp || null,
       scolarise: data.scolarise || null,
       etablissement: data.etablissement || null,
-      classe_actuelle: data.classeActuelle || null,
-      classe_visee: data.classeVisee || null,
+      classe_actuelle: data.classeActuelle || data.classe_actuelle || null,
+      classe_visee: data.classeVisee || data.classe_visee || null,
       projet: data.projet || null,
-      a_bulletins: data.aBulletins || null,
+      a_bulletins: data.aBulletins || data.a_bulletins || null,
       bulletins_file: bulletinsPath,
       autre_doc_file: autreDocPath,
-      interesse_foot: data.interesseFoot || null,
+      interesse_foot: data.interesseFoot || data.interesse_foot || null,
       poste: data.poste || null,
-      deja_club: data.dejaClub || null,
-      nom_club: data.nomClub || null,
+      deja_club: data.dejaClub || data.deja_club || null,
+      nom_club: data.nomClub || data.nom_club || null,
       anciennete: data.anciennete || null,
       objectifs: Array.isArray(objectifs) ? objectifs : [],
-      connu_par: data.connuPar || null,
-      connu_par_autre: data.connuParAutre || null,
-      message_libre: data.messageLibre || null,
-      resp_nom_prenom: data.respNomPrenom || null,
-      lien_eleve: data.lienEleve || null,
-      resp_tel: data.respTel || null,
-      resp_whatsapp: data.respWhatsapp || null,
+      connu_par: data.connuPar || data.connu_par || null,
+      connu_par_autre: data.connuParAutre || data.connu_par_autre || null,
+      message_libre: data.messageLibre || data.message_libre || null,
+      resp_nom_prenom: data.respNomPrenom || data.resp_nom_prenom || null,
+      lien_eleve: data.lienEleve || data.lien_eleve || null,
+      resp_tel: data.respTel || data.resp_tel || null,
+      resp_whatsapp: data.respWhatsapp || data.resp_whatsapp || null,
       certifie: Boolean(data.certifie),
-      auto_contact: Boolean(data.autoContact),
-      conditions_accorde: Boolean(data.conditionsAccorde),
-      auto_image: data.autoImage || null,
-      donnees_accorde: Boolean(data.donneesAccorde),
+      auto_contact: Boolean(data.autoContact || data.auto_contact),
+      conditions_accorde: Boolean(data.conditionsAccorde || data.conditions_accorde),
+      auto_image: data.autoImage || data.auto_image || null,
+      donnees_accorde: Boolean(data.donneesAccorde || data.donnees_accorde),
     };
 
     const { error } = await supabase.from('preinscriptions').insert([submission]);
 
     if (error) {
       console.error('Supabase error:', error);
-      return res.status(500).json({ error: 'Failed to save submission' });
+      return res.status(500).json({ error: error.message || 'Failed to save submission' });
     }
 
     return res.status(200).json({
@@ -87,6 +96,6 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error('Error processing submission:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: err.message || 'Internal server error' });
   }
 }
