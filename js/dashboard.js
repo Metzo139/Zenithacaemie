@@ -11,17 +11,11 @@ const sourceLabels = {
   'Non renseigné': 'Non renseigné',
 };
 
-const tokenKey = 'zenith_dashboard_token';
 const statusMessage = document.getElementById('statusMessage');
-
-function getToken() {
-  let token = sessionStorage.getItem(tokenKey);
-  if (!token) {
-    token = window.prompt('Entrez le token administrateur du tableau de bord :');
-    if (token) sessionStorage.setItem(tokenKey, token.trim());
-  }
-  return token;
-}
+const authPanel = document.getElementById('authPanel');
+const authForm = document.getElementById('authForm');
+const authMessage = document.getElementById('authMessage');
+let supabaseClient;
 
 function formatProject(value) {
   return projectLabels[value] || value;
@@ -62,17 +56,16 @@ function renderRecent(rows) {
 }
 
 async function loadDashboard() {
-  const token = getToken();
-  if (!token) return;
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) return;
   statusMessage.textContent = '';
   document.getElementById('refreshButton').disabled = true;
   try {
-    const response = await fetch('/api/dashboard', { headers: { 'x-dashboard-token': token } });
+    const response = await fetch('/api/dashboard', {
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
     const result = await response.json();
-    if (response.status === 401) {
-      sessionStorage.removeItem(tokenKey);
-      throw new Error('Token invalide. Recharge la page pour réessayer.');
-    }
+    if (response.status === 401) throw new Error('Session invalide. Reconnecte-toi.');
     if (!response.ok) throw new Error(result.error || 'Erreur de chargement');
 
     document.getElementById('totalKpi').textContent = result.total;
@@ -93,4 +86,29 @@ async function loadDashboard() {
 }
 
 document.getElementById('refreshButton').addEventListener('click', loadDashboard);
-loadDashboard();
+
+authForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  authMessage.textContent = 'Connexion...';
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: document.getElementById('authEmail').value,
+    password: document.getElementById('authPassword').value,
+  });
+  if (error) { authMessage.textContent = error.message; return; }
+  authMessage.textContent = '';
+  authPanel.hidden = true;
+  document.querySelector('.dashboard-shell').hidden = false;
+  loadDashboard();
+});
+
+async function initialize(){
+  const response = await fetch('/api/config');
+  const config = await response.json();
+  supabaseClient = window.supabase.createClient(config.url, config.anonKey);
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  authPanel.hidden = Boolean(session);
+  document.querySelector('.dashboard-shell').hidden = !session;
+  if (session) loadDashboard();
+}
+
+initialize().catch(error => { authMessage.textContent = error.message; });

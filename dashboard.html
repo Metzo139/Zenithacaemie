@@ -10,6 +10,17 @@
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
+  <section class="auth-panel" id="authPanel">
+    <p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / ACCÈS PRIVÉ</p>
+    <h1>Connexion au dashboard</h1>
+    <p>Connecte-toi avec ton compte administrateur Supabase.</p>
+    <form id="authForm">
+      <label>Email<input id="authEmail" type="email" required autocomplete="email"></label>
+      <label>Mot de passe<input id="authPassword" type="password" required autocomplete="current-password"></label>
+      <button class="refresh-button" type="submit">Se connecter</button>
+      <p class="status-message" id="authMessage" role="alert"></p>
+    </form>
+  </section>
   <main class="dashboard-shell">
     <header class="dashboard-header">
       <div>
@@ -40,6 +51,7 @@
     </section>
     <p class="status-message" id="statusMessage" role="status"></p>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/dashboard.js" defer></script>
 </body>
 </html>

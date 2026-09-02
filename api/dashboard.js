@@ -15,6 +15,11 @@ export default async function handler(req, res) {
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+    const authorization = req.headers.authorization || '';
+    const accessToken = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+    const { data: { user }, error: authError } = await supabase.auth.getUser(accessToken);
+    if (authError || !user) return res.status(401).json({ error: 'Accès non autorisé' });
+
     const { data, error } = await supabase
       .from('preinscriptions')
       .select('created_at,nom,prenom,projet,connu_par,classe_visee,bulletins_file,autre_doc_file')
