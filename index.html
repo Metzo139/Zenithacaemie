@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zénith Académie Guez — Préinscription</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- LEFT RAIL (desktop) -->
+  <aside class="rail" id="rail">
+    <div class="crest-badge"><img src="assets/logo.png" alt="Zénith Guez"></div>
+    <div class="rail-title display">Zénith Académie Guez </div>
+    <div class="rail-tagline">Éduquer via les vertus du sport</div>
+
+    <div class="steps" id="railSteps"></div>
+
+    <div class="rail-footer">Dossier de préinscription — vos informations sont utilisées uniquement pour l'étude de votre candidature.</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="panel">
+    <div class="mobile-bar">
+      <div class="mobile-bar-top">
+        <span class="mobile-bar-title">Zénith Académie Guez</span>
+        <span class="mobile-bar-step" id="mobileStepLabel">Étape 1/9</span>
+      </div>
+      <div class="mobile-progress-track"><div class="mobile-progress-fill" id="mobileProgressFill" style="width:11%;"></div></div>
+    </div>
+
+    <div class="panel-scroll">
+      <div class="panel-inner">
+
+        <!-- STEP: IDENTIFICATION -->
+        <section class="screen" data-screen="identification">
+          <div class="eyebrow">Section 1</div>
+          <h2>Faisons connaissance</h2>
+          <p class="screen-desc">Ces informations nous permettent d'identifier ta candidature et de te recontacter.</p>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Nom<span class="req">*</span></label>
+              <input type="text" data-field="nom" placeholder="Diop">
+              <div class="error-msg">Merci de renseigner ton nom.</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Prénom(s)<span class="req">*</span></label>
+              <input type="text" data-field="prenom" placeholder="Awa">
+              <div class="error-msg">Merci de renseigner ton/tes prénom(s).</div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Date de naissance<span class="req">*</span></label>
+              <input type="date" data-field="naissance">
+              <div class="error-msg">Merci de renseigner ta date de naissance.</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Sexe<span class="req">*</span></label>
+              <div class="choice-row" data-field="sexe">
+                <div class="choice-pill"><input type="radio" name="sexe" id="sexeM" value="Masculin"><label for="sexeM">Masculin</label></div>
+                <div class="choice-pill"><input type="radio" name="sexe" id="sexeF" value="Féminin"><label for="sexeF">Féminin</label></div>
+              </div>
+              <div class="error-msg">Merci de sélectionner une option.</div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Adresse / Quartier<span class="req">*</span></label>
+            <input type="text" data-field="adresse" placeholder="Ex : Sacré-Cœur 3, Dakar">
+            <div class="error-msg">Merci de renseigner ton adresse ou quartier.</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Téléphone du parent / tuteur<span class="req">*</span></label>
+              <input type="tel" data-field="telParent" placeholder="77 000 00 00">
+              <div class="error-msg">Merci de renseigner un numéro de téléphone.</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Numéro WhatsApp<span class="opt">optionnel</span></label>
+              <input type="tel" data-field="whatsapp" placeholder="77 000 00 00">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP: SCOLAIRE -->
+        <section class="screen" data-screen="scolaire">
+          <div class="eyebrow">Section 2</div>
+          <h2>Ta situation scolaire</h2>
+          <p class="screen-desc">Un aperçu de ton parcours actuel.</p>
+
+          <div class="field-group">
+            <label class="field-label">Es-tu actuellement scolarisé(e) ?<span class="req">*</span></label>
+            <div class="choice-row" data-field="scolarise">
+              <div class="choice-pill"><input type="radio" name="scolarise" id="scolOui" value="Oui"><label for="scolOui">Oui</label></div>
+              <div class="choice-pill"><input type="radio" name="scolarise" id="scolNon" value="Non"><label for="scolNon">Non</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Établissement actuellement fréquenté<span id="etabReqTag" class="opt">optionnel</span></label>
+              <input type="text" data-field="etablissement" placeholder="Ex : Collège Sacré-Cœur">
+              <div class="error-msg">Requis si tu es actuellement scolarisé(e).</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Classe actuellement suivie<span id="classeActReqTag" class="opt">optionnel</span></label>
+              <input type="text" data-field="classeActuelle" placeholder="Ex : 4ème">
+              <div class="error-msg">Requis si tu es actuellement scolarisé(e).</div>
+            </div>
+          </div>
+
+          <div class="field-group" id="classeViseeWrapper">
+            <label class="field-label">Classe que tu souhaites intégrer à Zénith<span class="req">*</span></label>
+            <input type="text" data-field="classeVisee" placeholder="Ex : 6e, 5e, 4e, Seconde, Première...">
+            <div class="error-msg">Merci d'indiquer la classe visée.</div>
+          </div>
+        </section>
+
+        <!-- STEP: PROJET -->
+        <section class="screen" data-screen="projet">
+          <div class="eyebrow">Section 3</div>
+          <h2>Ton projet à Zénith</h2>
+          <p class="screen-desc">Ce choix détermine les questions suivantes — sélectionne l'option qui correspond le mieux à ta démarche.</p>
+
+          <div class="project-cards" data-field="projet">
+            <div class="project-card">
+              <input type="radio" name="projet" id="projEtudes" value="etudes">
+              <label for="projEtudes">
+                <div class="icon">🎓</div>
+                <div class="title">Études uniquement</div>
+                <div class="sub">Intégrer le parcours scolaire de l'académie.</div>
+              </label>
+            </div>
+            <div class="project-card">
+              <input type="radio" name="projet" id="projFoot" value="football">
+              <label for="projFoot">
+                <div class="icon">⚽</div>
+                <div class="title">Football uniquement</div>
+                <div class="sub">Rejoindre la formation football.</div>
+              </label>
+            </div>
+            <div class="project-card">
+              <input type="radio" name="projet" id="projBoth" value="both">
+              <label for="projBoth">
+                <div class="icon">🎓⚽</div>
+                <div class="title">Études + Football</div>
+                <div class="sub">Combiner scolarité et formation sportive.</div>
+              </label>
+            </div>
+          </div>
+          <div class="error-msg" style="margin-top:10px;">Merci de choisir une option pour continuer.</div>
+        </section>
+
+        <!-- STEP: DOSSIER SCOLAIRE -->
+        <section class="screen" data-screen="dossier">
+          <div class="eyebrow">Section 4</div>
+          <h2>Dossier scolaire</h2>
+          <p class="screen-desc">Ces documents permettent à notre équipe pédagogique d'étudier ton dossier.</p>
+
+          <div class="field-group">
+            <label class="field-label">As-tu tes deux derniers bulletins scolaires ?<span class="req">*</span></label>
+            <div class="choice-row" data-field="aBulletins">
+              <div class="choice-pill"><input type="radio" name="aBulletins" id="bullOui" value="Oui"><label for="bullOui">Oui</label></div>
+              <div class="choice-pill"><input type="radio" name="aBulletins" id="bullNon" value="Non"><label for="bullNon">Non</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Bulletins scolaires <span id="bulletinsReqTag" class="req">*</span><span class="hint" style="display:block; margin-top:2px;">Regroupe tes deux derniers bulletins dans un seul fichier PDF.</span></label>
+            <div class="dropzone" data-dropzone="bulletinsFile">
+              <div class="dropzone-icon">📎</div>
+              <div class="dropzone-text">Clique pour choisir un fichier — PDF, JPG ou PNG</div>
+              <div class="dropzone-filename"></div>
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png" data-field="bulletinsFile">
+            </div>
+            <div class="error-msg">Merci de joindre ce document, ou indique que tu ne l'as pas encore.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Autre document scolaire<span class="opt">optionnel — relevé de notes, certificat de scolarité...</span></label>
+            <div class="dropzone" data-dropzone="autreDocFile">
+              <div class="dropzone-icon">📄</div>
+              <div class="dropzone-text">Clique pour choisir un fichier</div>
+              <div class="dropzone-filename"></div>
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png" data-field="autreDocFile">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP: FOOTBALL -->
+        <section class="screen" data-screen="football">
+          <div class="eyebrow">Section 5</div>
+          <h2>Informations football ⚽</h2>
+          <p class="screen-desc">Parle-nous un peu de ton parcours sur le terrain.</p>
+
+          <div class="field-group">
+            <label class="field-label">Es-tu intéressé(e) par la formation football ?<span class="req">*</span></label>
+            <div class="choice-row" data-field="interesseFoot">
+              <div class="choice-pill"><input type="radio" name="interesseFoot" id="ifOui" value="Oui"><label for="ifOui">Oui</label></div>
+              <div class="choice-pill"><input type="radio" name="interesseFoot" id="ifNon" value="Non"><label for="ifNon">Non</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Poste principal<span class="req">*</span></label>
+            <div class="choice-row" data-field="poste">
+              <div class="choice-pill"><input type="radio" name="poste" id="posGB" value="Gardien de but"><label for="posGB">Gardien de but</label></div>
+              <div class="choice-pill"><input type="radio" name="poste" id="posDef" value="Défenseur"><label for="posDef">Défenseur</label></div>
+              <div class="choice-pill"><input type="radio" name="poste" id="posMil" value="Milieu de terrain"><label for="posMil">Milieu de terrain</label></div>
+              <div class="choice-pill"><input type="radio" name="poste" id="posAtt" value="Attaquant"><label for="posAtt">Attaquant</label></div>
+              <div class="choice-pill"><input type="radio" name="poste" id="posNSP" value="Je ne sais pas encore"><label for="posNSP">Je ne sais pas encore</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner un poste.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">As-tu déjà joué dans un club ou une école de football ?<span class="req">*</span></label>
+            <div class="choice-row" data-field="dejaClub">
+              <div class="choice-pill"><input type="radio" name="dejaClub" id="dcOui" value="Oui"><label for="dcOui">Oui</label></div>
+              <div class="choice-pill"><input type="radio" name="dejaClub" id="dcNon" value="Non"><label for="dcNon">Non</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Nom du club / école de football<span class="opt">optionnel</span></label>
+              <input type="text" data-field="nomClub" placeholder="Ex : ASC Jeanne d'Arc">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Depuis combien de temps pratiques-tu ?<span class="opt">optionnel</span></label>
+              <select data-field="anciennete" style="width:100%; background:var(--paper-2); border:1.5px solid var(--line); border-radius:10px; padding:13px 14px; font-size:14.5px; color:var(--ink);">
+                <option value="">Sélectionner...</option>
+                <option>Débutant</option>
+                <option>Moins d'un an</option>
+                <option>1 à 2 ans</option>
+                <option>3 à 5 ans</option>
+                <option>Plus de 5 ans</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Quel est ton objectif dans le football ?<span class="opt">optionnel — plusieurs choix possibles</span></label>
+            <div class="chip-grid" data-field="objectifs">
+              <div class="chip"><input type="checkbox" id="obj1" value="Découvrir le football"><label for="obj1">Découvrir le football</label></div>
+              <div class="chip"><input type="checkbox" id="obj2" value="Améliorer mon niveau"><label for="obj2">Améliorer mon niveau</label></div>
+              <div class="chip"><input type="checkbox" id="obj3" value="Participer à des compétitions"><label for="obj3">Participer à des compétitions</label></div>
+              <div class="chip"><input type="checkbox" id="obj4" value="Intégrer un club"><label for="obj4">Intégrer un club</label></div>
+              <div class="chip"><input type="checkbox" id="obj5" value="Devenir footballeur professionnel"><label for="obj5">Devenir footballeur professionnel</label></div>
+              <div class="chip"><input type="checkbox" id="obj6" value="Autre"><label for="obj6">Autre</label></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP: COMPLEMENTAIRE -->
+        <section class="screen" data-screen="complementaire">
+          <div class="eyebrow">Section 6</div>
+          <h2>Informations complémentaires</h2>
+          <p class="screen-desc">Encore quelques questions, communes à toutes les candidatures.</p>
+
+          <div class="field-group">
+            <label class="field-label">Comment as-tu connu Zénith Académie Guez ?<span class="req">*</span></label>
+            <div class="choice-row" data-field="connuPar">
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp1" value="Flyer"><label for="cp1">📄 Flyer</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp2" value="Facebook"><label for="cp2">📘 Facebook</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp3" value="Instagram"><label for="cp3">📸 Instagram</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp4" value="TikTok"><label for="cp4">🎵 TikTok</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp5" value="WhatsApp"><label for="cp5">💬 WhatsApp</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp6" value="Recommandation / Bouche-à-oreille"><label for="cp6">👥 Recommandation</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp7" value="Événement / Détection"><label for="cp7">🏟️ Événement</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp8" value="Site internet"><label for="cp8">🌐 Site internet</label></div>
+              <div class="choice-pill"><input type="radio" name="connuPar" id="cp9" value="Autre"><label for="cp9">Autre</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-group conditional" id="autrePreciserWrap">
+            <label class="field-label">Précise</label>
+            <input type="text" data-field="connuParAutre" placeholder="Ta réponse">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Une question ou une information à nous communiquer ?<span class="opt">optionnel</span></label>
+            <textarea data-field="messageLibre" placeholder="Écris-nous ici..."></textarea>
+          </div>
+        </section>
+
+        <!-- STEP: RESPONSABLE -->
+        <section class="screen" data-screen="responsable">
+          <div class="eyebrow">Section 7</div>
+          <h2>Responsable légal</h2>
+          <p class="screen-desc">Pour les candidats mineurs, ces informations sont nécessaires au dossier.</p>
+
+          <div class="field-group">
+            <label class="field-label">Nom et prénom du parent / tuteur<span class="req">*</span></label>
+            <input type="text" data-field="respNomPrenom" placeholder="Ex : Moussa Diop">
+            <div class="error-msg">Merci de renseigner le nom du parent ou tuteur.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Lien avec l'élève<span class="opt">optionnel</span></label>
+            <div class="choice-row" data-field="lienEleve">
+              <div class="choice-pill"><input type="radio" name="lienEleve" id="lp" value="Père"><label for="lp">Père</label></div>
+              <div class="choice-pill"><input type="radio" name="lienEleve" id="lm" value="Mère"><label for="lm">Mère</label></div>
+              <div class="choice-pill"><input type="radio" name="lienEleve" id="lt" value="Tuteur / Tutrice"><label for="lt">Tuteur / Tutrice</label></div>
+              <div class="choice-pill"><input type="radio" name="lienEleve" id="la" value="Autre"><label for="la">Autre</label></div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label">Téléphone du parent / tuteur<span class="req">*</span></label>
+              <input type="tel" data-field="respTel" placeholder="77 000 00 00">
+              <div class="error-msg">Merci de renseigner un numéro de téléphone.</div>
+            </div>
+            <div class="field-group">
+              <label class="field-label">WhatsApp du parent / tuteur<span class="opt">optionnel</span></label>
+              <input type="tel" data-field="respWhatsapp" placeholder="77 000 00 00">
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP: AUTORISATION -->
+        <section class="screen" data-screen="autorisation">
+          <div class="eyebrow">Section 8</div>
+          <h2>Autorisations</h2>
+          <p class="screen-desc">Dernière étape avant l'envoi de ton dossier.</p>
+
+          <div class="field-group">
+            <div class="check-row">
+              <input type="checkbox" id="certifie" data-field="certifie">
+              <label for="certifie">Je certifie que les informations fournies dans ce formulaire sont exactes.<span class="req">*</span></label>
+            </div>
+            <div class="check-row">
+              <input type="checkbox" id="autoContact" data-field="autoContact">
+              <label for="autoContact">J'autorise Zénith Académie Guez à me contacter concernant la préinscription, l'étude du dossier, les séances de détection et les prochaines étapes.<span class="req">*</span></label>
+            </div>
+          </div>
+        </section>
+
+        <!-- STEP: CONSENTEMENT -->
+        <section class="screen" data-screen="consentement">
+          <div class="eyebrow">Section 9</div>
+          <h2>Consentement et conditions</h2>
+          <p class="screen-desc">Veuillez lire attentivement les conditions suivantes et exprimer votre accord.</p>
+
+          <div class="field-group" style="background:var(--paper-2); padding:16px; border-radius:10px; margin-bottom:16px;">
+            <p>Conditions de préinscription de Zénith Académie Guez</p>
+            <p>En remplissant ce formulaire, vous déclarez avoir pris connaissance des conditions suivantes et les accepter :</p>
+            <ol style="padding-left:20px;">
+              <li>Les informations fournies dans ce formulaire sont utilisées exclusivement dans le cadre de l'étude de votre candidature à Zénith Académie Guez.</li>
+              <li>Zénith Académie Guez s'engage à ne pas transmettre vos données personnelles à des tiers sans votre consentement préalable, sauf obligation légale.</li>
+              <li>Vous autorisez Zénith Académie Guez à vous contacter par téléphone, email ou WhatsApp pour suivre votre candidature et vous informer des étapes suivantes.</li>
+              <li>Vous consentez au traitement de vos données personnelles (nom, prénom, date de naissance, adresse, coordonnées, informations scolaires et sportives) par Zénith Académie Guez pour la gestion de votre candidature.</li>
+              <li>Vous autorisez l'utilisation éventuelle de photographies ou vidéos prises lors des activités de l'académie à des fins de promotion interne et externe (site web, réseaux sociaux, brochures), sauf indication contraire de votre part.</li>
+              <li>Vous avez le droit d'accéder, de rectifier ou de supprimer vos données personnelles en contactant Zénith Académie Guez à l'adresse email ou téléphone indiqué sur le site.</li>
+              <li>Cette autorisation est valable pour la durée nécessaire à la réalisation des objectifs mentionnés ci-dessus, sauf retrait de votre consentement.</li>
+            </ol>
+          </div>
+
+          <div class="field-group">
+            <div class="check-row">
+              <input type="checkbox" id="conditionsAccorde" data-field="conditionsAccorde">
+              <label for="conditionsAccorde">J’ai lu et j’accepte les conditions de préinscription de Zénith Académie Guez.<span class="req">*</span></label>
+            </div>
+            <div class="error-msg">Vous devez accepter les conditions pour continuer.</div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Autorisation concernant l'image<span class="req">*</span></label>
+            <div class="choice-row" data-field="autoImage" style="flex-direction:column; align-items:flex-start; gap:8px;">
+              <div class="choice-pill"><input type="radio" name="autoImage" id="imgOui" value="J'autorise l'utilisation de mon image"><label for="imgOui">J'autorise Zénith Académie Guez à utiliser les photos/vidéos du candidat</label></div>
+              <div class="choice-pill"><input type="radio" name="autoImage" id="imgNon" value="Je n'autorise pas l'utilisation de mon image"><label for="imgNon">Je n'autorise pas l'utilisation de son image</label></div>
+            </div>
+            <div class="error-msg">Merci de sélectionner une option.</div>
+          </div>
+
+          <div class="field-group">
+            <div class="check-row">
+              <input type="checkbox" id="donneesAccorde" data-field="donneesAccorde">
+              <label for="donneesAccorde">Je consens au traitement de mes données personnelles par Zénith Académie Guez dans le cadre de la préinscription et des échanges liés à ma candidature.<span class="req">*</span></label>
+            </div>
+            <div class="error-msg">Vous devez consentir au traitement de vos données pour continuer.</div>
+          </div>
+        </section>
+
+        <!-- STEP: RECAP -->
+        <section class="screen" data-screen="recap">
+          <div class="eyebrow">Section 10</div>
+          <h2>Vérifie ton dossier</h2>
+          <p class="screen-desc">Relis attentivement tes informations avant l'envoi. Tu peux modifier une section en cliquant sur "Modifier".</p>
+          <div id="recapContent"></div>
+        </section>
+
+        <!-- STEP: SUCCESS -->
+        <section class="screen" data-screen="success">
+          <div class="success-wrap">
+            <div class="seal"><img src="assets/logo.png" alt="Zénith Guez"></div>
+            <h2>Merci pour ta préinscription !</h2>
+            <p>Ton dossier a bien été transmis à Zénith Académie Guez. Notre équipe va examiner les informations fournies et te contactera prochainement pour les prochaines étapes.</p>
+            <a href="#" id="waSendBtn" target="_blank" class="wa-cta">💬 Envoyer le récapitulatif sur WhatsApp</a>
+            <div class="success-note">Zénith Académie Guez — Former · Encadrer · Révéler les talents</div>
+          </div>
+        </section>
+
+        <div class="nav-buttons" id="navButtons">
+          <button class="btn btn-prev" id="btnPrev">← Précédent</button>
+          <button class="btn btn-next" id="btnNext">Suivant →</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="js/script.js" defer></script>
+</body>
+</html>
