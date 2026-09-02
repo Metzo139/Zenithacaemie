@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/submit.js": {
-      "runtime": "now-nodejs@18"
+      "runtime": "now-nodejs@20"
     }
   }
 }
