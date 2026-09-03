@@ -414,11 +414,11 @@ async function buildPdf(){
     pdf.rect(0, 0, 7, 38, 'F');
     pdf.addImage(logo, 'PNG', margin, 7, 31, 22);
     pdf.setFontSize(13);
-    pdf.text('ZÉNITH ACADÉMIE GUEZ', margin + 11, 14);
+    pdf.text('ZÉNITH ACADÉMIE GUEZ', pageWidth / 2, 14, { align:'center' });
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(8);
     pdf.setTextColor(190, 201, 188);
-    pdf.text('DOSSIER DE PRÉINSCRIPTION', margin + 11, 23);
+    pdf.text('DOSSIER DE PRÉINSCRIPTION', pageWidth / 2, 23, { align:'center' });
     pdf.text(new Date().toLocaleDateString('fr-FR'), pageWidth - margin, 17, { align:'right' });
     y = 51;
   };
