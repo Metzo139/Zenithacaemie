@@ -344,10 +344,27 @@ function renderRecap(){
 }
 
 /* ============ SUBMIT ============ */
-function buildPdf(){
+let logoDataUrl;
+
+async function getLogoDataUrl(){
+  if(logoDataUrl) return logoDataUrl;
+  const response = await fetch('assets/logo.png');
+  if(!response.ok) throw new Error('Le logo Zénith est indisponible.');
+  const blob = await response.blob();
+  logoDataUrl = await new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+  return logoDataUrl;
+}
+
+async function buildPdf(){
   const jsPdf = window.jspdf?.jsPDF;
   if(!jsPdf) throw new Error('Le générateur PDF est indisponible.');
 
+  const logo = await getLogoDataUrl();
   const pdf = new jsPdf();
   const margin = 18;
   const pageWidth = pdf.internal.pageSize.getWidth();
@@ -395,10 +412,7 @@ function buildPdf(){
     pdf.rect(0, 0, pageWidth, 38, 'F');
     pdf.setFillColor(...brandGreen);
     pdf.rect(0, 0, 7, 38, 'F');
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(21);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text('Z', margin, 17);
+    pdf.addImage(logo, 'PNG', margin, 7, 31, 22);
     pdf.setFontSize(13);
     pdf.text('ZÉNITH ACADÉMIE GUEZ', margin + 11, 14);
     pdf.setFont('helvetica', 'normal');
@@ -464,7 +478,7 @@ function buildPdf(){
 }
 
 async function sendPdfToWhatsApp(){
-  const pdfBlob = buildPdf();
+  const pdfBlob = await buildPdf();
   const pdfFile = new File([pdfBlob], 'preinscription-zenith.pdf', { type: 'application/pdf' });
   const whatsappNumber = '221781171818';
   const message = 'Bonjour, voici le récapitulatif PDF de ma préinscription à Zénith Académie Guez.';
@@ -503,10 +517,10 @@ async function submitForm(){
     if(!response.ok) throw new Error(result.error || 'Impossible d’enregistrer le dossier.');
 
     const downloadButton = document.getElementById('downloadPdfBtn');
-    downloadButton.onclick = event => {
+    downloadButton.onclick = async event => {
       event.preventDefault();
       try {
-        const pdfBlob = buildPdf();
+        const pdfBlob = await buildPdf();
         const downloadUrl = URL.createObjectURL(pdfBlob);
         const temporaryLink = document.createElement('a');
         temporaryLink.href = downloadUrl;
