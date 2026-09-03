@@ -5,11 +5,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const token = req.headers['x-dashboard-token'];
-  if (!process.env.DASHBOARD_TOKEN || token !== process.env.DASHBOARD_TOKEN) {
-    return res.status(401).json({ error: 'Accès non autorisé' });
-  }
-
   try {
     const supabase = createClient(
       process.env.SUPABASE_URL,
@@ -22,7 +17,7 @@ export default async function handler(req, res) {
 
     const { data, error } = await supabase
       .from('preinscriptions')
-      .select('created_at,nom,prenom,projet,connu_par,classe_visee,bulletins_file,autre_doc_file')
+      .select('created_at,nom,prenom,naissance,sexe,adresse,tel_parent,whatsapp,scolarise,etablissement,classe_actuelle,classe_visee,projet,a_bulletins,bulletins_file,autre_doc_file,interesse_foot,poste,deja_club,nom_club,anciennete,objectifs,connu_par,connu_par_autre,message_libre,resp_nom_prenom,lien_eleve,resp_tel,resp_whatsapp,certifie,auto_contact,conditions_accorde,auto_image,donnees_accorde')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -48,6 +43,7 @@ export default async function handler(req, res) {
         autres: (data || []).filter(row => row.autre_doc_file).length,
       },
       recent: (data || []).slice(0, 10),
+      exportRows: data || [],
     });
   } catch (error) {
     console.error('Dashboard error:', error);

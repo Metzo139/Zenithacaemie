@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/dashboard.css">
-  <style>:root{--orange:#73d32c;--orange-soft:#a7e84d;--green:#5fce29}.brand-mark{color:#73d32c}</style>
+  <style>:root{--orange:#73d32c;--orange-soft:#a7e84d;--green:#5fce29}.brand-mark{color:#73d32c}.kpi-card strong{font-size:32px}.bar-value{font-size:13px}.document-stats strong{font-size:34px}@media(max-width:620px){.kpi-card strong{font-size:27px}.document-stats strong{font-size:30px}}</style>
 </head>
 <body>
   <section class="auth-panel" id="authPanel">
@@ -34,7 +34,7 @@
     <div class="dashboard-content" id="overview">
     <header class="dashboard-header">
       <div><p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / PILOTAGE</p><h1>Bonjour, administrateur <span class="wave">✦</span></h1><p class="header-note">Voici ce qui se passe avec les candidatures aujourd'hui.</p></div>
-      <div class="header-actions"><time datetime="2026-09-03">03 septembre 2026</time><button class="refresh-button" id="refreshButton" type="button"><span>↻</span> Actualiser</button></div>
+      <div class="header-actions"><time datetime="2026-09-03">03 septembre 2026</time><button class="refresh-button export-button" id="exportButton" type="button"><span>↓</span> Exporter CSV</button><button class="refresh-button" id="refreshButton" type="button"><span>↻</span> Actualiser</button></div>
     </header>
 
     <section class="kpi-grid" aria-label="Indicateurs principaux">
@@ -47,7 +47,7 @@
     <section class="analytics-grid" id="analytics">
       <article class="panel-card wide-chart"><div class="card-heading"><div><h2>Rythme des candidatures</h2><p>Évolution des dossiers reçus</p></div><span class="select-label">Cette année⌄</span></div><div id="monthsChart" class="bar-list chart-bars"></div></article>
       <article class="panel-card"><div class="card-heading"><div><h2>Projets choisis</h2><p>Répartition des parcours</p></div><span class="card-index">01</span></div><div id="projectsChart" class="bar-list"></div></article>
-      <article class="panel-card"><div class="card-heading"><div><h2>Origine des contacts</h2><p>Comment nous ont-ils trouvés ?</p></div><span class="card-index">02</span></div><div id="sourcesChart" class="bar-list"></div></article>
+      <article class="panel-card"><div class="card-heading"><div><h2>Réseaux et sources</h2><p>Comment nous ont-ils trouvés ?</p></div><span class="card-index">02</span></div><div id="sourcesChart" class="bar-list"></div></article>
       <article class="panel-card document-card" id="documents"><div class="card-heading"><div><h2>Dossiers documentés</h2><p>Pièces reçues avec les dossiers</p></div><span class="card-index">03</span></div><div class="document-stats"><div><strong id="bulletinsKpi">—</strong><span>avec bulletins</span></div><div><strong id="otherDocsKpi">—</strong><span>autres documents</span></div></div></article>
     </section>
 

@@ -349,46 +349,116 @@ function buildPdf(){
   if(!jsPdf) throw new Error('Le générateur PDF est indisponible.');
 
   const pdf = new jsPdf();
-  const margin = 16;
+  const margin = 18;
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
-  let y = 20;
+  const contentWidth = pageWidth - margin * 2;
+  const brandGreen = [115, 211, 44];
+  const dark = [20, 24, 19];
+  const muted = [103, 112, 105];
+  let y = 18;
   const projectLabel = formData.projet === 'etudes' ? 'Études uniquement' : formData.projet === 'football' ? 'Football uniquement' : 'Études + Football';
-  const rows = [
-    ['Nom', formData.nom], ['Prénom(s)', formData.prenom], ['Date de naissance', formData.naissance],
-    ['Sexe', formData.sexe], ['Adresse', formData.adresse], ['Téléphone parent', formData.telParent],
-    ['WhatsApp', formData.whatsapp || '—'], ['Scolarisé', formData.scolarise],
-    ['Établissement', formData.etablissement || '—'], ['Classe actuelle', formData.classeActuelle || '—'],
-    ['Classe visée', formData.classeVisee || '—'], ['Projet', projectLabel],
-    ['Bulletins', formData.bulletinsFile || '—'], ['Autre document', formData.autreDocFile || '—'],
-    ['Intéressé football', formData.interesseFoot || '—'], ['Poste', formData.poste || '—'],
-    ['Club / école', formData.nomClub || '—'], ['Ancienneté', formData.anciennete || '—'],
-    ['Objectifs', (formData.objectifs || []).join(', ') || '—'],
-    ['Connu par', formData.connuPar || '—'], ['Message', formData.messageLibre || '—'],
-    ['Responsable légal', formData.respNomPrenom], ['Lien', formData.lienEleve || '—'],
-    ['Téléphone responsable', formData.respTel], ['WhatsApp responsable', formData.respWhatsapp || '—'],
-    ['Informations exactes', formData.certifie ? 'Oui' : 'Non'], ['Autorise le contact', formData.autoContact ? 'Oui' : 'Non'],
-    ['Conditions acceptées', formData.conditionsAccorde ? 'Oui' : 'Non'], ['Autorisation image', formData.autoImage || '—'],
-    ['Données personnelles', formData.donneesAccorde ? 'Oui' : 'Non'],
+  const sections = [
+    { title:'Identification', rows:[
+      ['Nom', formData.nom], ['Prénom(s)', formData.prenom], ['Date de naissance', formData.naissance],
+      ['Sexe', formData.sexe], ['Adresse', formData.adresse], ['Téléphone parent', formData.telParent], ['WhatsApp', formData.whatsapp],
+    ]},
+    { title:'Situation scolaire', rows:[
+      ['Scolarisé', formData.scolarise], ['Établissement', formData.etablissement], ['Classe actuelle', formData.classeActuelle], ['Classe visée', formData.classeVisee],
+    ]},
+    { title:'Projet choisi', rows:[['Parcours', projectLabel]] },
   ];
+  if(formData.projet === 'etudes' || formData.projet === 'both') sections.push({ title:'Dossier scolaire', rows:[
+    ['A ses bulletins', formData.aBulletins], ['Bulletins joints', formData.bulletinsFile], ['Autre document', formData.autreDocFile],
+  ]});
+  if(formData.projet === 'football' || formData.projet === 'both') sections.push({ title:'Football', rows:[
+    ['Intéressé', formData.interesseFoot], ['Poste', formData.poste], ['Déjà en club', formData.dejaClub], ['Club / école', formData.nomClub],
+    ['Ancienneté', formData.anciennete], ['Objectifs', (formData.objectifs || []).join(', ')],
+  ]});
+  sections.push(
+    { title:'Complémentaire', rows:[['Connu par', formData.connuPar === 'Autre' ? `Autre — ${formData.connuParAutre || ''}` : formData.connuPar], ['Message', formData.messageLibre]] },
+    { title:'Responsable légal', rows:[['Nom', formData.respNomPrenom], ['Lien', formData.lienEleve], ['Téléphone', formData.respTel], ['WhatsApp', formData.respWhatsapp]] },
+    { title:'Autorisations et consentement', rows:[['Informations exactes', formData.certifie ? 'Oui' : 'Non'], ['Autorise le contact', formData.autoContact ? 'Oui' : 'Non'], ['Conditions acceptées', formData.conditionsAccorde ? 'Oui' : 'Non'], ['Autorisation image', formData.autoImage], ['Données personnelles', formData.donneesAccorde ? 'Oui' : 'Non']] },
+  );
 
+  const addFooter = () => {
+    pdf.setDrawColor(225, 230, 223);
+    pdf.line(margin, pageHeight - 14, pageWidth - margin, pageHeight - 14);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.setTextColor(...muted);
+    pdf.text('Zénith Académie Guez  •  Dossier de préinscription', margin, pageHeight - 8);
+    pdf.text(`Page ${pdf.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - 8, { align:'right' });
+  };
+  const addHeader = () => {
+    pdf.setFillColor(...dark);
+    pdf.rect(0, 0, pageWidth, 38, 'F');
+    pdf.setFillColor(...brandGreen);
+    pdf.rect(0, 0, 7, 38, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(21);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text('Z', margin, 17);
+    pdf.setFontSize(13);
+    pdf.text('ZÉNITH ACADÉMIE GUEZ', margin + 11, 14);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.setTextColor(190, 201, 188);
+    pdf.text('DOSSIER DE PRÉINSCRIPTION', margin + 11, 23);
+    pdf.text(new Date().toLocaleDateString('fr-FR'), pageWidth - margin, 17, { align:'right' });
+    y = 51;
+  };
+  const ensureSpace = height => {
+    if(y + height > pageHeight - 23){ addFooter(); pdf.addPage(); addHeader(); }
+  };
+
+  addHeader();
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(18);
-  pdf.text('Préinscription Zénith Académie Guez', margin, y);
-  y += 10;
+  pdf.setTextColor(...dark);
+  pdf.text('Récapitulatif de candidature', margin, y);
+  y += 7;
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(10);
-  pdf.setTextColor(90, 98, 96);
-  pdf.text(`Dossier généré le ${new Date().toLocaleDateString('fr-FR')}`, margin, y);
-  y += 12;
-  pdf.setTextColor(23, 26, 20);
+  pdf.setTextColor(...muted);
+  pdf.text('Merci pour ton intérêt pour notre académie.', margin, y);
+  y += 10;
+  pdf.setFillColor(235, 249, 226);
+  pdf.roundedRect(margin, y, contentWidth, 15, 3, 3, 'F');
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(10);
+  pdf.setTextColor(55, 114, 32);
+  pdf.text(`Parcours sélectionné : ${projectLabel}`, margin + 7, y + 9.5);
+  y += 25;
 
-  rows.forEach(([label, value]) => {
-    const lines = pdf.splitTextToSize(`${label} : ${value || '—'}`, pageWidth - margin * 2);
-    if(y + lines.length * 5 + 3 > pageHeight - margin){ pdf.addPage(); y = margin; }
-    pdf.text(lines, margin, y);
-    y += lines.length * 5 + 3;
+  sections.forEach(section => {
+    const rowsHeight = section.rows.reduce((height, [, value]) => {
+      const lines = pdf.splitTextToSize(String(value || '—'), contentWidth - 72);
+      return height + Math.max(9, lines.length * 4.5 + 5);
+    }, 0);
+    ensureSpace(rowsHeight + 16);
+    pdf.setFillColor(...brandGreen);
+    pdf.roundedRect(margin, y, contentWidth, 8, 2, 2, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(section.title, margin + 5, y + 5.5);
+    y += 13;
+    section.rows.forEach(([label, value]) => {
+      const lines = pdf.splitTextToSize(String(value || '—'), contentWidth - 72);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor(...muted);
+      pdf.text(label.toUpperCase(), margin + 3, y + 3.5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9);
+      pdf.setTextColor(...dark);
+      pdf.text(lines, margin + 69, y + 3.5);
+      y += Math.max(9, lines.length * 4.5 + 5);
+    });
+    y += 5;
   });
+  addFooter();
 
   return pdf.output('blob');
 }

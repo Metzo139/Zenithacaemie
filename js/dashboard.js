@@ -8,6 +8,9 @@ const projectLabels = {
 const sourceLabels = {
   'Recommandation / Bouche-à-oreille': 'Recommandation',
   'Événement / Détection': 'Événement',
+  Facebook: 'Facebook',
+  Instagram: 'Instagram',
+  TikTok: 'TikTok',
   'Non renseigné': 'Non renseigné',
 };
 
@@ -16,6 +19,19 @@ const authPanel = document.getElementById('authPanel');
 const authForm = document.getElementById('authForm');
 const authMessage = document.getElementById('authMessage');
 let supabaseClient;
+let exportRows = [];
+
+const exportColumns = [
+  ['created_at', 'Date de candidature'], ['nom', 'Nom'], ['prenom', 'Prénom(s)'], ['naissance', 'Date de naissance'],
+  ['sexe', 'Sexe'], ['adresse', 'Adresse'], ['tel_parent', 'Téléphone parent'], ['whatsapp', 'WhatsApp'],
+  ['scolarise', 'Scolarisé'], ['etablissement', 'Établissement'], ['classe_actuelle', 'Classe actuelle'], ['classe_visee', 'Classe visée'],
+  ['projet', 'Projet'], ['a_bulletins', 'A des bulletins'], ['bulletins_file', 'Bulletins joints'], ['autre_doc_file', 'Autre document'],
+  ['interesse_foot', 'Intéressé football'], ['poste', 'Poste'], ['deja_club', 'Déjà en club'], ['nom_club', 'Club / école'],
+  ['anciennete', 'Ancienneté'], ['objectifs', 'Objectifs'], ['connu_par', 'Connu par'], ['connu_par_autre', 'Autre source'],
+  ['message_libre', 'Message'], ['resp_nom_prenom', 'Responsable légal'], ['lien_eleve', 'Lien avec l’élève'], ['resp_tel', 'Téléphone responsable'],
+  ['resp_whatsapp', 'WhatsApp responsable'], ['certifie', 'Informations exactes'], ['auto_contact', 'Autorise le contact'],
+  ['conditions_accorde', 'Conditions acceptées'], ['auto_image', 'Autorisation image'], ['donnees_accorde', 'Données personnelles'],
+];
 
 function formatProject(value) {
   return projectLabels[value] || value;
@@ -55,6 +71,28 @@ function renderRecent(rows) {
   `).join('');
 }
 
+function csvValue(value) {
+  const normalized = Array.isArray(value) ? value.join(', ') : value ?? '';
+  return `"${String(normalized).replace(/"/g, '""')}"`;
+}
+
+function exportCsv() {
+  if (!exportRows.length) {
+    statusMessage.textContent = 'Aucune candidature à exporter.';
+    return;
+  }
+  const header = exportColumns.map(([, label]) => csvValue(label)).join(';');
+  const lines = exportRows.map(row => exportColumns.map(([key]) => csvValue(row[key])).join(';'));
+  const csv = `\uFEFF${[header, ...lines].join('\n')}`;
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `candidatures-zenith-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+  statusMessage.textContent = `${exportRows.length} candidature(s) exportée(s).`;
+}
+
 async function loadDashboard() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (!session) return;
@@ -67,6 +105,7 @@ async function loadDashboard() {
     const result = await response.json();
     if (response.status === 401) throw new Error('Session invalide. Reconnecte-toi.');
     if (!response.ok) throw new Error(result.error || 'Erreur de chargement');
+    exportRows = result.exportRows || [];
 
     document.getElementById('totalKpi').textContent = result.total;
     document.getElementById('studiesKpi').textContent = result.projects?.etudes || 0;
@@ -86,6 +125,7 @@ async function loadDashboard() {
 }
 
 document.getElementById('refreshButton').addEventListener('click', loadDashboard);
+document.getElementById('exportButton').addEventListener('click', exportCsv);
 
 authForm.addEventListener('submit', async event => {
   event.preventDefault();
@@ -103,7 +143,13 @@ authForm.addEventListener('submit', async event => {
 
 async function initialize(){
   const response = await fetch('/api/config');
+  if (!response.ok) {
+    throw new Error('Le dashboard doit être ouvert depuis le site déployé, pas depuis un fichier local.');
+  }
   const config = await response.json();
+  if (!config.url || !config.anonKey) {
+    throw new Error('Configuration Supabase manquante.');
+  }
   supabaseClient = window.supabase.createClient(config.url, config.anonKey);
   const { data: { session } } = await supabaseClient.auth.getSession();
   authPanel.hidden = Boolean(session);
