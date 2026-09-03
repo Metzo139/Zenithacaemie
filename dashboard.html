@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/dashboard.css">
-  <style>:root{--orange:#73d32c;--orange-soft:#a7e84d;--green:#5fce29}.brand-mark{color:#73d32c}.kpi-card strong{font-size:32px}.bar-value{font-size:13px}.document-stats strong{font-size:34px}@media(max-width:620px){.kpi-card strong{font-size:27px}.document-stats strong{font-size:30px}}</style>
+  <style>:root{--orange:#73d32c;--orange-soft:#a7e84d;--green:#5fce29}.brand-mark{color:#73d32c}.kpi-card strong{font-size:32px}.bar-value{font-size:13px}.document-stats strong{font-size:34px}.filter-control{display:flex;align-items:center;gap:7px;color:var(--muted);font:600 10px 'IBM Plex Mono'}.filter-control select{border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);padding:10px 25px 10px 10px;font:500 11px Inter;outline:none}.filter-control select:focus{border-color:var(--orange)}.filter-control option{background:var(--panel);color:var(--text)}@media(max-width:620px){.kpi-card strong{font-size:27px}.document-stats strong{font-size:30px}.header-actions{flex-wrap:wrap}.filter-control{order:3;width:100%;justify-content:space-between}.filter-control select{flex:1}}</style>
 </head>
 <body>
   <section class="auth-panel" id="authPanel">
@@ -34,7 +34,7 @@
     <div class="dashboard-content" id="overview">
     <header class="dashboard-header">
       <div><p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / PILOTAGE</p><h1>Bonjour, administrateur <span class="wave">✦</span></h1><p class="header-note">Voici ce qui se passe avec les candidatures aujourd'hui.</p></div>
-      <div class="header-actions"><time datetime="2026-09-03">03 septembre 2026</time><button class="refresh-button export-button" id="exportButton" type="button"><span>↓</span> Exporter CSV</button><button class="refresh-button" id="refreshButton" type="button"><span>↻</span> Actualiser</button></div>
+      <div class="header-actions"><time datetime="2026-09-03">03 septembre 2026</time><label class="filter-control" for="projectFilter"><span>Filtrer</span><select id="projectFilter"><option value="all">Tous les parcours</option><option value="etudes">Études uniquement</option><option value="both">Études + Football</option><option value="football">Football uniquement</option></select></label><button class="refresh-button export-button" id="exportButton" type="button"><span>↓</span> Exporter CSV</button><button class="refresh-button" id="refreshButton" type="button"><span>↻</span> Actualiser</button></div>
     </header>
 
     <section class="kpi-grid" aria-label="Indicateurs principaux">

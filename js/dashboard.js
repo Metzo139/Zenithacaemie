@@ -20,6 +20,7 @@ const authForm = document.getElementById('authForm');
 const authMessage = document.getElementById('authMessage');
 let supabaseClient;
 let exportRows = [];
+let selectedProject = 'all';
 
 const exportColumns = [
   ['created_at', 'Date de candidature'], ['nom', 'Nom'], ['prenom', 'Prénom(s)'], ['naissance', 'Date de naissance'],
@@ -77,20 +78,24 @@ function csvValue(value) {
 }
 
 function exportCsv() {
-  if (!exportRows.length) {
+  const rowsToExport = selectedProject === 'all'
+    ? exportRows
+    : exportRows.filter(row => row.projet === selectedProject);
+  if (!rowsToExport.length) {
     statusMessage.textContent = 'Aucune candidature à exporter.';
     return;
   }
   const header = exportColumns.map(([, label]) => csvValue(label)).join(';');
-  const lines = exportRows.map(row => exportColumns.map(([key]) => csvValue(row[key])).join(';'));
+  const lines = rowsToExport.map(row => exportColumns.map(([key]) => csvValue(row[key])).join(';'));
   const csv = `\uFEFF${[header, ...lines].join('\n')}`;
   const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
   const link = document.createElement('a');
   link.href = url;
-  link.download = `candidatures-zenith-${new Date().toISOString().slice(0, 10)}.csv`;
+  const suffix = selectedProject === 'all' ? 'toutes' : selectedProject;
+  link.download = `candidatures-zenith-${suffix}-${new Date().toISOString().slice(0, 10)}.csv`;
   link.click();
   URL.revokeObjectURL(url);
-  statusMessage.textContent = `${exportRows.length} candidature(s) exportée(s).`;
+  statusMessage.textContent = `${rowsToExport.length} candidature(s) exportée(s).`;
 }
 
 async function loadDashboard() {
@@ -126,6 +131,9 @@ async function loadDashboard() {
 
 document.getElementById('refreshButton').addEventListener('click', loadDashboard);
 document.getElementById('exportButton').addEventListener('click', exportCsv);
+document.getElementById('projectFilter').addEventListener('change', event => {
+  selectedProject = event.target.value;
+});
 
 authForm.addEventListener('submit', async event => {
   event.preventDefault();
