@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/dashboard.css">
+  <style>:root{--orange:#73d32c;--orange-soft:#a7e84d;--green:#5fce29}.brand-mark{color:#73d32c}</style>
 </head>
 <body>
   <section class="auth-panel" id="authPanel">
@@ -21,35 +22,41 @@
       <p class="status-message" id="authMessage" role="alert"></p>
     </form>
   </section>
-  <main class="dashboard-shell">
+  <main class="dashboard-shell" hidden>
+    <aside class="sidebar" aria-label="Navigation principale">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">Z</span><span><strong>Zénith</strong><small>Académie Guez</small></span></a>
+      <p class="nav-label">Menu principal</p>
+      <nav><a class="nav-item active" href="#overview"><span>◈</span>Vue d'ensemble</a><a class="nav-item" href="#recent"><span>▤</span>Candidatures</a><a class="nav-item" href="#projectsChart"><span>◒</span>Projets</a><a class="nav-item" href="#sourcesChart"><span>↗</span>Sources</a></nav>
+      <p class="nav-label nav-label-system">Système</p>
+      <nav><a class="nav-item" href="#analytics"><span>◫</span>Analyses</a><a class="nav-item" href="#documents"><span>⚙</span>Paramètres</a></nav>
+      <div class="sidebar-footer"><span class="status-dot"></span><span><strong>Compte admin</strong><small>Accès sécurisé</small></span></div>
+    </aside>
+    <div class="dashboard-content" id="overview">
     <header class="dashboard-header">
-      <div>
-        <p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / PILOTAGE</p>
-        <h1>Vue d'ensemble</h1>
-        <p class="header-note">Les candidatures entrantes, au même endroit.</p>
-      </div>
-      <button class="refresh-button" id="refreshButton" type="button">Actualiser</button>
+      <div><p class="eyebrow">ZÉNITH ACADÉMIE GUEZ / PILOTAGE</p><h1>Bonjour, administrateur <span class="wave">✦</span></h1><p class="header-note">Voici ce qui se passe avec les candidatures aujourd'hui.</p></div>
+      <div class="header-actions"><time datetime="2026-09-03">03 septembre 2026</time><button class="refresh-button" id="refreshButton" type="button"><span>↻</span> Actualiser</button></div>
     </header>
 
     <section class="kpi-grid" aria-label="Indicateurs principaux">
-      <article class="kpi-card kpi-main"><span>Total candidatures</span><strong id="totalKpi">—</strong><small>depuis l'ouverture du formulaire</small></article>
-      <article class="kpi-card"><span>Études uniquement</span><strong id="studiesKpi">—</strong><small>projet académique</small></article>
-      <article class="kpi-card"><span>Études + sport</span><strong id="bothKpi">—</strong><small>double parcours</small></article>
-      <article class="kpi-card"><span>Football uniquement</span><strong id="footballKpi">—</strong><small>projet sportif</small></article>
+      <article class="kpi-card kpi-main"><div class="kpi-top"><span>Total candidatures</span><i>◈</i></div><strong id="totalKpi">—</strong><small><b>↗</b> Depuis l'ouverture du formulaire</small><div class="sparkline orange"></div></article>
+      <article class="kpi-card"><div class="kpi-top"><span>Études uniquement</span><i class="green-icon">↗</i></div><strong id="studiesKpi">—</strong><small><b>↗</b> Projet académique</small><div class="sparkline green"></div></article>
+      <article class="kpi-card"><div class="kpi-top"><span>Études + sport</span><i>✦</i></div><strong id="bothKpi">—</strong><small><b>↗</b> Double parcours</small><div class="sparkline orange"></div></article>
+      <article class="kpi-card"><div class="kpi-top"><span>Football uniquement</span><i>↗</i></div><strong id="footballKpi">—</strong><small><b>↗</b> Projet sportif</small><div class="sparkline orange"></div></article>
     </section>
 
-    <section class="analytics-grid">
-      <article class="panel-card"><div class="card-heading"><h2>Projets choisis</h2><span class="card-index">01</span></div><div id="projectsChart" class="bar-list"></div></article>
-      <article class="panel-card"><div class="card-heading"><h2>Origine des contacts</h2><span class="card-index">02</span></div><div id="sourcesChart" class="bar-list"></div></article>
-      <article class="panel-card"><div class="card-heading"><h2>Rythme des candidatures</h2><span class="card-index">03</span></div><div id="monthsChart" class="bar-list"></div></article>
-      <article class="panel-card document-card"><div class="card-heading"><h2>Dossiers documentés</h2><span class="card-index">04</span></div><div class="document-stats"><div><strong id="bulletinsKpi">—</strong><span>avec bulletins</span></div><div><strong id="otherDocsKpi">—</strong><span>autres documents</span></div></div></article>
+    <section class="analytics-grid" id="analytics">
+      <article class="panel-card wide-chart"><div class="card-heading"><div><h2>Rythme des candidatures</h2><p>Évolution des dossiers reçus</p></div><span class="select-label">Cette année⌄</span></div><div id="monthsChart" class="bar-list chart-bars"></div></article>
+      <article class="panel-card"><div class="card-heading"><div><h2>Projets choisis</h2><p>Répartition des parcours</p></div><span class="card-index">01</span></div><div id="projectsChart" class="bar-list"></div></article>
+      <article class="panel-card"><div class="card-heading"><div><h2>Origine des contacts</h2><p>Comment nous ont-ils trouvés ?</p></div><span class="card-index">02</span></div><div id="sourcesChart" class="bar-list"></div></article>
+      <article class="panel-card document-card" id="documents"><div class="card-heading"><div><h2>Dossiers documentés</h2><p>Pièces reçues avec les dossiers</p></div><span class="card-index">03</span></div><div class="document-stats"><div><strong id="bulletinsKpi">—</strong><span>avec bulletins</span></div><div><strong id="otherDocsKpi">—</strong><span>autres documents</span></div></div></article>
     </section>
 
     <section class="panel-card recent-card">
-      <div class="card-heading"><div><h2>Dernières candidatures</h2><p>Les dix dossiers les plus récents.</p></div><span class="card-index">05</span></div>
+      <div class="card-heading"><div><h2>Dernières candidatures</h2><p>Les dix dossiers les plus récents.</p></div><button class="text-button" type="button">Voir tout <span>→</span></button></div>
       <div class="table-wrap"><table><thead><tr><th>Candidat</th><th>Projet</th><th>Source</th><th>Classe visée</th><th>Date</th></tr></thead><tbody id="recentTable"><tr><td colspan="5" class="empty-state">Chargement...</td></tr></tbody></table></div>
     </section>
     <p class="status-message" id="statusMessage" role="status"></p>
+    </div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/dashboard.js" defer></script>
