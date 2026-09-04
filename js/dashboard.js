@@ -112,16 +112,44 @@ async function loadDashboard() {
     if (!response.ok) throw new Error(result.error || 'Erreur de chargement');
     exportRows = result.exportRows || [];
 
-    document.getElementById('totalKpi').textContent = result.total;
-    document.getElementById('studiesKpi').textContent = result.projects?.etudes || 0;
-    document.getElementById('bothKpi').textContent = result.projects?.both || 0;
-    document.getElementById('footballKpi').textContent = result.projects?.football || 0;
-    document.getElementById('bulletinsKpi').textContent = result.documents?.bulletins || 0;
-    document.getElementById('otherDocsKpi').textContent = result.documents?.autres || 0;
-    drawBars('projectsChart', result.projects, formatProject);
-    drawBars('sourcesChart', result.sources, value => sourceLabels[value] || value);
-    drawBars('monthsChart', result.months);
-    renderRecent(result.recent);
+    // Filter data based on selected project filter
+    const filteredExportRows = selectedProject === 'all'
+      ? exportRows
+      : exportRows.filter(row => row.projet === selectedProject);
+
+    // Calculate filtered stats
+    const filteredTotal = filteredExportRows.length;
+    const filteredProjects = filteredExportRows.reduce((result, row) => {
+      const value = row.projet || 'Non renseigné';
+      result[value] = (result[value] || 0) + 1;
+      return result;
+    }, {});
+    const filteredSources = filteredExportRows.reduce((result, row) => {
+      const value = row.connu_par || 'Non renseigné';
+      result[value] = (result[value] || 0) + 1;
+      return result;
+    }, {});
+    const filteredMonths = filteredExportRows.reduce((result, row) => {
+      const month = new Date(row.created_at).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+      result[month] = (result[month] || 0) + 1;
+      return result;
+    }, {});
+    const filteredDocuments = {
+      bulletins: filteredExportRows.filter(row => row.bulletins_file).length,
+      autres: filteredExportRows.filter(row => row.autre_doc_file).length,
+    };
+    const filteredRecent = filteredExportRows.slice(0, 10);
+
+    document.getElementById('totalKpi').textContent = filteredTotal;
+    document.getElementById('studiesKpi').textContent = filteredProjects?.etudes || 0;
+    document.getElementById('bothKpi').textContent = filteredProjects?.both || 0;
+    document.getElementById('footballKpi').textContent = filteredProjects?.football || 0;
+    document.getElementById('bulletinsKpi').textContent = filteredDocuments.bulletins || 0;
+    document.getElementById('otherDocsKpi').textContent = filteredDocuments.autres || 0;
+    drawBars('projectsChart', filteredProjects, formatProject);
+    drawBars('sourcesChart', filteredSources, value => sourceLabels[value] || value);
+    drawBars('monthsChart', filteredMonths);
+    renderRecent(filteredRecent);
   } catch (error) {
     statusMessage.textContent = error.message;
   } finally {
