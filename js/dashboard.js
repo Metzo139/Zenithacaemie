@@ -150,6 +150,17 @@ async function loadDashboard() {
     drawBars('sourcesChart', filteredSources, value => sourceLabels[value] || value);
     drawBars('monthsChart', filteredMonths);
     renderRecent(filteredRecent);
+
+    // Update date in header to current date
+    const now = new Date();
+    const dateOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+    const formattedDate = now.toLocaleDateString('fr-FR', dateOptions);
+    const isoDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateElement = document.querySelector('.header-actions time');
+    if (dateElement) {
+      dateElement.textContent = formattedDate;
+      dateElement.setAttribute('datetime', isoDate);
+    }
   } catch (error) {
     statusMessage.textContent = error.message;
   } finally {
